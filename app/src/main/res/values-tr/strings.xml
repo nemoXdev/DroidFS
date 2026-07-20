@@ -114,7 +114,7 @@
     <string name="camera">Kamera</string>
     <string name="picture_save_success">Resim şuraya kaydedildi: %s</string>
     <string name="picture_save_failed">Bu resim kaydedilemedi.</string>
-    <string name="video_save_success">Resim şuraya kaydedildi: %s</string>
+    <string name="video_save_success">Video şuraya kaydedildi: %s</string>
     <string name="file_overwrite_question">%s zaten mevcut, üzerine yazmak istiyor musunuz ?</string>
     <string name="dir_overwrite_question">%s zaten mevcut, içeriğini birleştirmek istiyor musunuz ?</string>
     <string name="enter_new_name">Yeni ad girin</string>
@@ -272,7 +272,7 @@
     <string name="memfd_create_unsupported">Mevcut çekirdeğiniz memfd_create() özelliğini desteklemiyor. Bu özellik minimum %s çekirdek sürümünü gerektirir.</string>
     <string name="export_method">Dışa aktarma yöntemi</string>
     <string name="export_method_summary">Dosya dışa aktarma yöntemi. Açıkta kalan dosyaları paylaşmak, harici olarak açmak ve bunlara erişmek için kullanılır.</string>
-    <string name="debug">Debug</string>
+    <string name="debug">Hata ayıklama</string>
     <string name="logcat_title">DroidFS Logcat</string>
     <string name="logcat_saved">Logcat kaydedildi</string>
     <string name="later">Daha sonra</string>
@@ -290,9 +290,8 @@
     <string name="enter_volume_path">Birim yolunu girin</string>
     <string name="more_options">Daha fazla seçenek</string>
     <string name="take_photos_repeatedly">Fotoğrafları tekrar tekrar çek</string>
-    <string name="critical_file_delete_warning">Bu dosya şifreli birim için kritik öneme sahiptir. Silinmesi kalıcı veri kaybına yol açacaktır. İşlem iptal edildi.</string>
     <string name="duplicate_file_in_batch">Bu içe aktarma toplu işinde aynı isimde bir dosya zaten mevcut: %s</string>
-    <string name="volume_integrity_warning">Uyarı: Bu birimdeki bazı klasörler okunamadı. Bu, veri bozulmasına işaret edebilir. Lütfen verilerinizi hemen yedekleyin.</string>
+    <string name="volume_integrity_warning">Uyarı: Bu şifreli klasördeki bazı dosyalar okunamadı. Bu, veri bozulmasına işaret edebilir. Lütfen önceden bir yedekleme yaptığınızdan emin olun.</string>
     <string name="volume_init_failed">Birim başlatılamadı. Lütfen birim dosyalarının erişilebilir ve bozulmamış olduğundan emin olun.</string>
     <string name="volume_init_unknown_error">Birim açılamadı (hata kodu: %d). Lütfen şifrenizi kontrol edin ve birim dosyalarının bozulmamış olduğundan emin olun.</string>
     <string name="io_error_during_operation">Dosyaya erişirken bir G/Ç hatası oluştu. Veriler bozulmuş olabilir.</string>

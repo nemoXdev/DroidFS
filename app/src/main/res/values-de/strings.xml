@@ -60,7 +60,7 @@
     <string name="fingerprint_instruction">Bitte berühren Sie den Fingerabdrucksensor</string>
     <string name="illegal_block_size_exception">IllegalBlockSizeException</string>
     <string name="illegal_block_size_exception_msg">Dies kann passieren, wenn Sie einen neuen Fingerabdruck hinzugefügt haben. Das Zurücksetzen des Hash-Speichers kann dieses Problem lösen.</string>
-    <string name="reset_hash_storage">Reset hash storage</string>
+    <string name="reset_hash_storage">Hash-Speicher zurücksetzen</string>
     <string name="MAC_verification_failed">Signatur/MAC-Verifizierung fehlgeschlagen. Entweder Android KeyStore oder der gespeicherte Hash wurde verändert. Das Zurücksetzen des Hash-Speichers kann dieses Problem lösen.</string>
     <string name="hash_storage_reset">Hash-Speicher erfolgreich zurückgesetzt</string>
     <string name="encrypt_action_description">Kennwort-Hash verschlüsseln und speichern.</string>
@@ -106,7 +106,7 @@
     <string name="github_summary">Das DroidFS-Repository auf GitHub. Quellcode, Dokumentation, Bugtracker…</string>
     <string name="gitea">Gitea</string>
     <string name="gitea_summary">Das DroidFS-Repository auf der Chapril Gitea-Instanz. Im Gegensatz zu GitHub ist Gitea vollständig freie Software und wird selbst gehostet. Quellcode, Dokumentation, Bugtracker…</string>
-    <string name="share">Share</string>
+    <string name="share">Teilen</string>
     <string name="decrypt_files">Exportieren/Entschlüsseln</string>
     <string name="copy_failed">Kopie von %s fehlgeschlagen.</string>
     <string name="copy_success">Kopie erfolgreich erstellt.</string>
@@ -263,7 +263,7 @@
     <string name="usf_expose_summary">Anderen Anwendungen das Durchsuchen offener Datenträger als Dokumentanbieter erlauben</string>
     <string name="usf_saf_write">Schreibzugriff gewähren</string>
     <string name="usf_saf_write_summary">Schreibzugriff beim Öffnen von Dateien mit anderen Anwendungen gewähren</string>
-    <string name="saf">Storage Access Framework</string>
+    <string name="saf">Speicherzugriffsrahmen</string>
     <string name="tmp_export_failed">Export fehlgeschlagen: %s</string>
     <string name="export_failed_create">kann exportierte Datei nicht erstellen</string>
     <string name="export_failed_export">Fehler beim Exportieren der Datei</string>
@@ -290,9 +290,8 @@
     <string name="enter_volume_path">Volume-Pfad eingeben</string>
     <string name="more_options">Weitere Optionen</string>
     <string name="take_photos_repeatedly">Fotos wiederholt aufnehmen</string>
-    <string name="critical_file_delete_warning">Diese Datei ist für den verschlüsselten Datenträger kritisch. Das Löschen führt zu dauerhaftem Datenverlust. Vorgang abgebrochen.</string>
     <string name="duplicate_file_in_batch">Eine Datei mit dem gleichen Namen existiert bereits in diesem Import: %s</string>
-    <string name="volume_integrity_warning">Warnung: Einige Ordner in diesem Volume konnten nicht gelesen werden. Dies deutet auf eine Beschädigung der Daten hin. Bitte sichern Sie Ihre Daten sofort.</string>
+    <string name="volume_integrity_warning">Warnung: Einige Dateien in diesem verschlüsselten Ordner können nicht gelesen werden. Dies deutet auf eine Beschädigung der Daten hin. Bitte stellen Sie sicher, dass Sie bereits eine Sicherungskopie haben.</string>
     <string name="volume_init_failed">Initialisierung des Volumes fehlgeschlagen. Bitte überprüfen Sie, ob die Dateien des Volumes zugänglich sind.</string>
     <string name="volume_init_unknown_error">Öffnen des Volumes fehlgeschlagen (Fehlercode: %d). Bitte überprüfen Sie Ihr Passwort und stellen Sie sicher, dass die Dateien intakt sind.</string>
     <string name="io_error_during_operation">Ein I/O-Fehler beim Zugriff auf die Datei ist aufgetreten. Die Daten könnten beschädigt sein.</string>

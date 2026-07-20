@@ -15,6 +15,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.provider.OpenableColumns
 import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -41,9 +42,7 @@ import sushi.hardcore.droidfs.R
 import sushi.hardcore.droidfs.VolumeManager
 import sushi.hardcore.droidfs.VolumeManagerApp
 import sushi.hardcore.droidfs.explorers.ExplorerElement
-import sushi.hardcore.droidfs.filesystems.CryfsVolume
 import sushi.hardcore.droidfs.filesystems.EncryptedVolume
-import sushi.hardcore.droidfs.filesystems.GocryptfsVolume
 import sushi.hardcore.droidfs.filesystems.Stat
 import sushi.hardcore.droidfs.util.AndroidUtils
 import sushi.hardcore.droidfs.util.ObjRef
@@ -238,11 +237,28 @@ class FileOperationService : Service() {
         foregroundNotificationId = id
     }
 
+    private fun formatFileSize(bytes: Long): String {
+        return when {
+            bytes < 1024L -> "$bytes B"
+            bytes < 1024L * 1024 -> "${bytes / 1024} KB"
+            bytes < 1024L * 1024 * 1024 -> String.format("%.1f MB", bytes / (1024.0 * 1024))
+            else -> String.format("%.2f GB", bytes / (1024.0 * 1024 * 1024))
+        }
+    }
+
     private fun updateNotificationProgress(taskId: Int, progress: Int, total: Int) {
         val notificationBuilder = notifications[taskId] ?: return
         notificationBuilder
                 .setProgress(total, progress, false)
                 .setContentText("$progress/$total")
+        notificationManager.notify(taskId, notificationBuilder.build())
+    }
+
+    private fun updateNotificationProgress(taskId: Int, fileProgress: Int, totalFiles: Int, bytesProgress: Long, totalBytes: Long) {
+        val notificationBuilder = notifications[taskId] ?: return
+        notificationBuilder
+                .setProgress(totalFiles, fileProgress, false)
+                .setContentText("$fileProgress/$totalFiles · ${formatFileSize(bytesProgress)} / ${formatFileSize(totalBytes)}")
         notificationManager.notify(taskId, notificationBuilder.build())
     }
 
@@ -381,6 +397,7 @@ class FileOperationService : Service() {
         srcPath: String,
         dstPath: String,
         srcEncryptedVolume: EncryptedVolume = encryptedVolume,
+        onBytesTransferred: ((Long) -> Unit)? = null,
     ): Boolean {
         var success = true
         val srcFileHandle = srcEncryptedVolume.openFileReadMode(srcPath)
@@ -395,6 +412,7 @@ class FileOperationService : Service() {
                     val written = encryptedVolume.write(dstFileHandle, offset, ioBuffer, 0, length).toLong()
                     if (written == length) {
                         offset += written
+                        onBytesTransferred?.invoke(length)
                     } else {
                         success = false
                         break
@@ -420,6 +438,13 @@ class FileOperationService : Service() {
         val srcEncryptedVolume = getEncryptedVolume(srcVolumeId)
         return volumeTask(R.string.file_op_copy_msg, items.size, volumeId) { taskId, encryptedVolume ->
             var failedItem: String? = null
+            var totalBytes: Long = 0
+            val fileSizes = items.map { item ->
+                if (item.isDirectory) 0L else {
+                    (srcEncryptedVolume.getAttr(item.srcPath)?.size ?: 0L).also { totalBytes += it }
+                }
+            }
+            var bytesTransferred: Long = 0
             for (i in items.indices) {
                 yield()
                 if (items[i].isDirectory) {
@@ -428,11 +453,18 @@ class FileOperationService : Service() {
                             failedItem = items[i].srcPath
                         }
                     }
-                } else if (!copyFile(encryptedVolume, items[i].srcPath, items[i].dstPath!!, srcEncryptedVolume)) {
+                } else if (!copyFile(encryptedVolume, items[i].srcPath, items[i].dstPath!!, srcEncryptedVolume) { bytes ->
+                    bytesTransferred += bytes
+                    if (totalBytes > 0) {
+                        updateNotificationProgress(taskId, i + 1, items.size, bytesTransferred, totalBytes)
+                    }
+                }) {
                     failedItem = items[i].srcPath
                 }
                 if (failedItem == null) {
-                    updateNotificationProgress(taskId, i+1, items.size)
+                    if (totalBytes == 0L) {
+                        updateNotificationProgress(taskId, i + 1, items.size)
+                    }
                 } else {
                     break
                 }
@@ -467,24 +499,42 @@ class FileOperationService : Service() {
         }
     }
 
+    private fun getUriFileSize(uri: Uri): Long {
+        return contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+                if (sizeIndex >= 0) cursor.getLong(sizeIndex) else -1L
+            } else -1L
+        } ?: -1L
+    }
+
     private suspend fun importFilesFromUris(
         encryptedVolume: EncryptedVolume,
         dstPaths: List<String>,
         uris: List<Uri>,
         taskId: Int,
+        totalBytes: Long = 0,
     ): String? {
         var failedIndex = -1
+        var bytesTransferred: Long = 0
         for (i in dstPaths.indices) {
             yield()
             try {
-                if (!encryptedVolume.importFile(this@FileOperationService, uris[i], dstPaths[i])) {
+                if (!encryptedVolume.importFile(this@FileOperationService, uris[i], dstPaths[i]) { bytes ->
+                    bytesTransferred += bytes
+                    if (totalBytes > 0) {
+                        updateNotificationProgress(taskId, i + 1, dstPaths.size, bytesTransferred, totalBytes)
+                    }
+                }) {
                     failedIndex = i
                 }
             } catch (e: FileNotFoundException) {
                 failedIndex = i
             }
             if (failedIndex == -1) {
-                updateNotificationProgress(taskId, i+1, dstPaths.size)
+                if (totalBytes == 0L) {
+                    updateNotificationProgress(taskId, i + 1, dstPaths.size)
+                }
             } else {
                 return uris[failedIndex].toString()
             }
@@ -494,7 +544,8 @@ class FileOperationService : Service() {
 
     suspend fun importFilesFromUris(volumeId: Int, dstPaths: List<String>, uris: List<Uri>): TaskResult<out String?> {
         return volumeTask(R.string.file_op_import_msg, dstPaths.size, volumeId) { taskId, encryptedVolume ->
-            importFilesFromUris(encryptedVolume, dstPaths, uris, taskId)
+            val totalBytes = uris.sumOf { getUriFileSize(it).coerceAtLeast(0) }
+            importFilesFromUris(encryptedVolume, dstPaths, uris, taskId, totalBytes)
         }
     }
 
@@ -547,7 +598,8 @@ class FileOperationService : Service() {
                 }
             }
             if (failedItem == null) {
-                failedItem = importFilesFromUris(encryptedVolume, dstFiles, srcUris, taskId)
+                val totalBytes = srcUris.sumOf { getUriFileSize(it).coerceAtLeast(0) }
+                failedItem = importFilesFromUris(encryptedVolume, dstFiles, srcUris, taskId, totalBytes)
             }
             failedItem
         }, srcUris)
@@ -572,14 +624,14 @@ class FileOperationService : Service() {
         })
     }
 
-    private fun exportFileInto(encryptedVolume: EncryptedVolume, srcPath: String, treeDocumentFile: DocumentFile): Boolean {
+    private fun exportFileInto(encryptedVolume: EncryptedVolume, srcPath: String, treeDocumentFile: DocumentFile, onBytesTransferred: ((Long) -> Unit)? = null): Boolean {
         val outputStream = treeDocumentFile.createFile("*/*", File(srcPath).name)?.uri?.let {
             contentResolver.openOutputStream(it)
         }
         return if (outputStream == null) {
             false
         } else {
-            encryptedVolume.exportFile(srcPath, outputStream)
+            encryptedVolume.exportFile(srcPath, outputStream, onBytesTransferred)
         }
     }
 
@@ -587,6 +639,7 @@ class FileOperationService : Service() {
         encryptedVolume: EncryptedVolume,
         plain_directory_path: String,
         treeDocumentFile: DocumentFile,
+        onBytesTransferred: ((Long) -> Unit)? = null,
     ): String? {
         treeDocumentFile.createDirectory(File(plain_directory_path).name)?.let { childTree ->
             val explorerElements = encryptedVolume.readDir(plain_directory_path) ?: return null
@@ -594,8 +647,8 @@ class FileOperationService : Service() {
                 yield()
                 val fullPath = PathUtils.pathJoin(plain_directory_path, e.name)
                 if (e.isDirectory) {
-                    recursiveExportDirectory(encryptedVolume, fullPath, childTree)?.let { return it }
-                } else if (!exportFileInto(encryptedVolume, fullPath, childTree)) {
+                    recursiveExportDirectory(encryptedVolume, fullPath, childTree, onBytesTransferred)?.let { return it }
+                } else if (!exportFileInto(encryptedVolume, fullPath, childTree, onBytesTransferred)) {
                     return fullPath
                 }
             }
@@ -604,37 +657,47 @@ class FileOperationService : Service() {
         return treeDocumentFile.name
     }
 
+    private fun sumEncryptedFileSizes(encryptedVolume: EncryptedVolume, items: List<ExplorerElement>): Long {
+        var total = 0L
+        for (item in items) {
+            if (!item.isDirectory) {
+                total += encryptedVolume.getAttr(item.fullPath)?.size ?: 0L
+            }
+        }
+        return total
+    }
+
     suspend fun exportFiles(volumeId: Int, items: List<ExplorerElement>, uri: Uri): TaskResult<out String?> {
         return volumeTask(R.string.file_op_export_msg, items.size, volumeId) { taskId, encryptedVolume ->
             val treeDocumentFile = DocumentFile.fromTreeUri(this@FileOperationService, uri)!!
             var failedItem: String? = null
+            val totalBytes = sumEncryptedFileSizes(encryptedVolume, items)
+            var bytesTransferred: Long = 0
             for (i in items.indices) {
                 yield()
+                val onBytes: ((Long) -> Unit)? = if (totalBytes > 0) { bytes ->
+                    bytesTransferred += bytes
+                    updateNotificationProgress(taskId, i + 1, items.size, bytesTransferred, totalBytes)
+                } else null
                 failedItem = if (items[i].isDirectory) {
-                    recursiveExportDirectory(encryptedVolume, items[i].fullPath, treeDocumentFile)
+                    recursiveExportDirectory(encryptedVolume, items[i].fullPath, treeDocumentFile, onBytes)
                 } else {
-                    if (exportFileInto(encryptedVolume, items[i].fullPath, treeDocumentFile)) {
+                    if (exportFileInto(encryptedVolume, items[i].fullPath, treeDocumentFile, onBytes)) {
                         null
                     } else {
                         items[i].fullPath
                     }
                 }
                 if (failedItem == null) {
-                    updateNotificationProgress(taskId, i+1, items.size)
+                    if (totalBytes == 0L) {
+                        updateNotificationProgress(taskId, i + 1, items.size)
+                    }
                 } else {
                     break
                 }
             }
             failedItem
         }
-    }
-
-    private fun isCriticalVolumeFile(path: String): Boolean {
-        val fileName = File(path).name
-        return fileName == GocryptfsVolume.CONFIG_FILE_NAME ||
-               fileName == CryfsVolume.CONFIG_FILE_NAME ||
-               fileName == ".diriv" ||
-               fileName == "gocryptfs.conf.bak"
     }
 
     private suspend fun recursiveRemoveDirectory(encryptedVolume: EncryptedVolume, path: String): String? {
@@ -661,10 +724,6 @@ class FileOperationService : Service() {
             var failedItem: String? = null
             for ((i, element) in items.withIndex()) {
                 yield()
-                if (isCriticalVolumeFile(element.fullPath)) {
-                    failedItem = element.fullPath
-                    break
-                }
                 if (element.isDirectory) {
                     recursiveRemoveDirectory(encryptedVolume, element.fullPath)?.let { failedItem = it }
                 } else if (!encryptedVolume.deleteFile(element.fullPath)) {
@@ -692,13 +751,28 @@ class FileOperationService : Service() {
         return count
     }
 
+    private suspend fun sumChildFileSizes(rootDirectory: DocumentFile): Long {
+        yield()
+        var total = 0L
+        for (child in rootDirectory.listFiles()) {
+            if (child.isFile) {
+                total += child.length()
+            } else {
+                total += sumChildFileSizes(child)
+            }
+        }
+        return total
+    }
+
     private suspend fun recursiveCopyVolume(
         src: DocumentFile,
         dst: DocumentFile,
         dstRootDirectory: ObjRef<DocumentFile?>?,
         taskId: Int,
         total: Int,
-        progress: ObjRef<Int> = ObjRef(0)
+        totalBytes: Long,
+        progress: ObjRef<Int> = ObjRef(0),
+        bytesTransferred: ObjRef<Long> = ObjRef(0),
     ): DocumentFile? {
         val dstDir = dst.createDirectory(src.name ?: return src) ?: return src
         dstRootDirectory?.let { it.value = dstDir }
@@ -709,15 +783,27 @@ class FileOperationService : Service() {
                 val outputStream = contentResolver.openOutputStream(dstFile.uri)
                 val inputStream = contentResolver.openInputStream(child.uri)
                 if (outputStream == null || inputStream == null) return child
-                val written = inputStream.copyTo(outputStream)
+                val ioBuffer = ByteArray(Constants.IO_BUFF_SIZE)
+                var read: Int
+                var fileBytesRead: Long = 0
+                while (inputStream.read(ioBuffer).also { read = it } != -1) {
+                    outputStream.write(ioBuffer, 0, read)
+                    bytesTransferred.value += read
+                    fileBytesRead += read
+                    if (totalBytes > 0) {
+                        updateNotificationProgress(taskId, progress.value + 1, total, bytesTransferred.value, totalBytes)
+                    }
+                }
                 outputStream.close()
                 inputStream.close()
-                if (written != child.length()) return child
+                if (fileBytesRead != child.length()) return child
             } else {
-                recursiveCopyVolume(child, dstDir, null, taskId, total, progress)?.let { return it }
+                recursiveCopyVolume(child, dstDir, null, taskId, total, totalBytes, progress, bytesTransferred)?.let { return it }
             }
             progress.value++
-            updateNotificationProgress(taskId, progress.value, total)
+            if (totalBytes == 0L) {
+                updateNotificationProgress(taskId, progress.value, total)
+            }
         }
         return null
     }
@@ -728,8 +814,9 @@ class FileOperationService : Service() {
         val dstRootDirectory = ObjRef<DocumentFile?>(null)
         val result = globalTask(R.string.copy_volume_notification, null, { taskId ->
             val total = recursiveCountChildElements(src)
+            val totalBytes = sumChildFileSizes(src)
             updateNotificationProgress(taskId, 0, total)
-            recursiveCopyVolume(src, dst, dstRootDirectory, taskId, total)
+            recursiveCopyVolume(src, dst, dstRootDirectory, taskId, total, totalBytes)
         }, {
             dstRootDirectory.value?.delete()
         })

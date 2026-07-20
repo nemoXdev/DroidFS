@@ -373,6 +373,8 @@ open class BaseExplorerActivity : BaseActivity(), ExplorerElementAdapter.Listene
         loader.isVisible = true
         val readResult = encryptedVolume.readDir(path)
         if (readResult == null) {
+            loader.isVisible = false
+            recycler_view_explorer.isVisible = true
             CustomAlertDialogBuilder(this@BaseExplorerActivity, theme)
                 .setTitle(R.string.warning)
                 .setMessage(R.string.volume_integrity_warning)

@@ -108,23 +108,24 @@ abstract class EncryptedVolume: Observable<EncryptedVolume.Observer>() {
         return getAttr(path) != null
     }
 
-    fun exportFile(fileHandle: Long, os: OutputStream): Boolean {
+    fun exportFile(fileHandle: Long, os: OutputStream, onBytesTransferred: ((Long) -> Unit)? = null): Boolean {
         var offset: Long = 0
         val ioBuffer = ByteArray(Constants.IO_BUFF_SIZE)
         var length: Int
         while (read(fileHandle, offset, ioBuffer, 0, ioBuffer.size.toLong()).also { length = it } > 0) {
             os.write(ioBuffer, 0, length)
             offset += length.toLong()
+            onBytesTransferred?.invoke(length.toLong())
         }
         os.close()
         return true
     }
 
-    fun exportFile(src_path: String, os: OutputStream): Boolean {
+    fun exportFile(src_path: String, os: OutputStream, onBytesTransferred: ((Long) -> Unit)? = null): Boolean {
         var success = false
         val srcfileHandle = openFileReadMode(src_path)
         if (srcfileHandle != -1L) {
-            success = exportFile(srcfileHandle, os)
+            success = exportFile(srcfileHandle, os, onBytesTransferred)
             closeFile(srcfileHandle)
         }
         return success
@@ -142,7 +143,7 @@ abstract class EncryptedVolume: Observable<EncryptedVolume.Observer>() {
         return false
     }
 
-    fun importFile(inputStream: InputStream, dst_path: String): Boolean {
+    fun importFile(inputStream: InputStream, dst_path: String, onBytesTransferred: ((Long) -> Unit)? = null): Boolean {
         val dstfileHandle = openFileWriteMode(dst_path)
         if (dstfileHandle != -1L) {
             var success = true
@@ -157,6 +158,7 @@ abstract class EncryptedVolume: Observable<EncryptedVolume.Observer>() {
                     success = false
                     break
                 }
+                onBytesTransferred?.invoke(length)
             }
             truncate(dst_path, offset)
             closeFile(dstfileHandle)
@@ -166,10 +168,10 @@ abstract class EncryptedVolume: Observable<EncryptedVolume.Observer>() {
         return false
     }
 
-    fun importFile(context: Context, src_uri: Uri, dst_path: String): Boolean {
+    fun importFile(context: Context, src_uri: Uri, dst_path: String, onBytesTransferred: ((Long) -> Unit)? = null): Boolean {
         val inputStream = context.contentResolver.openInputStream(src_uri)
         if (inputStream != null) {
-            return importFile(inputStream, dst_path)
+            return importFile(inputStream, dst_path, onBytesTransferred)
         }
         return false
     }

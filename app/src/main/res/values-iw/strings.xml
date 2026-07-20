@@ -290,9 +290,8 @@
     <string name="enter_volume_path">הזן נתיב אמצעי אחסון</string>
     <string name="more_options">אפשרויות נוספות</string>
     <string name="take_photos_repeatedly">צלם תמונות באופן חוזר</string>
-    <string name="critical_file_delete_warning">קובץ זה קריטי לאמצעי האחסון המוצפן. מחיקתו תוביל לאיבוד נתונים לצמיתות. הפעולה בוטלה.</string>
     <string name="duplicate_file_in_batch">קובץ בשם זה כבר קיים באצולת הייבוא הזו: %s</string>
-    <string name="volume_integrity_warning">אזהרה: תיקיות מסוימות באמצעי אחסון זה לא ניתן לקריאה. הדבר עשוי להצביע על פגיעה בנתונים. אנא גבה את הנתונים שלך מיד.</string>
+    <string name="volume_integrity_warning">אזהרה: קבצים מסוימים בתיקייה מוצפנת זו לא ניתנים לקריאה. הדבר עשוי להצביע על פגיעה בנתונים. אנא ודאו שיש לכם גיבוי מראש.</string>
     <string name="volume_init_failed">איפוס אמצעי האחסון נכשל. אנא ודא שקבצי אמצעי האחסון נגישים ואינם פגומים.</string>
     <string name="volume_init_unknown_error">פתיחת אמצעי האחסון נכשלה (קוד שגיאה: %d). אנא בדוק את הסיסמה שלך וודא שקבצי אמצעי האחסון שלמים.</string>
     <string name="io_error_during_operation">שגיאת קלט/פלט אירעה בעת גישה לקובץ. הנתונים עשויים להיות פגומים.</string>

@@ -291,9 +291,8 @@
     <string name="enter_volume_path">输入卷路径</string>
     <string name="more_options">更多选项</string>
     <string name="take_photos_repeatedly">重复拍照</string>
-    <string name="critical_file_delete_warning">此文件对加密卷至关重要。删除它将导致数据永久丢失。操作已取消。</string>
     <string name="duplicate_file_in_batch">在此导入批次中已存在同名文件: %s</string>
-    <string name="volume_integrity_warning">警告: 此卷中某些文件夹无法读取。这可能表明数据损坏。请立即备份您的数据。</string>
+    <string name="volume_integrity_warning">警告: 此加密文件夹中某些文件无法读取。这可能表明数据损坏。请确保您已提前做好备份。</string>
     <string name="volume_init_failed">初始化卷失败。请验证卷文件是否可访问且未损坏。</string>
     <string name="volume_init_unknown_error">打开卷失败（错误代码: %d）。请检查密码并确保卷文件完整。</string>
     <string name="io_error_during_operation">访问文件时发生I/O错误。数据可能已损坏。</string>

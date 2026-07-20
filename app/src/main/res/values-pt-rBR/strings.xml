@@ -162,8 +162,8 @@
     <string name="camera_optimization">Otimização da câmera</string>
     <string name="maximize_quality">Maximizar a qualidade</string>
     <string name="minimize_latency">Minimizar a latência</string>
-    <string name="auto">Autom</string>
-    <string name="encryption_cipher_label">Cipher de criptografia:</string>
+    <string name="auto">Automático</string>
+    <string name="encryption_cipher_label">Algoritmo de criptografia:</string>
     <string name="theme">Tema</string>
     <string name="thumbnails">Imagem em miniatura</string>
     <string name="thumbnails_summary">Mostrar imagens e vídeos em miniatura</string>
@@ -290,9 +290,8 @@
     <string name="add_cant_write_warning">DroidFS não tem acesso de escrita a este caminho. Adicionando volume com acesso somente leitura.</string>
     <string name="sdcard_error_add_footer">Adicionando volume com acesso somente leitura.</string>
     <string name="sdcard_error_create_footer">Por favor, use um subdiretório deste caminho ou o armazenamento interno.</string>
-    <string name="critical_file_delete_warning">Este arquivo é crítico para o volume criptografado. Excluí-lo resultará em perda permanente de dados. Operação cancelada.</string>
     <string name="duplicate_file_in_batch">Já existe um arquivo com o mesmo nome neste lote de importação: %s</string>
-    <string name="volume_integrity_warning">Aviso: Alguns diretórios neste volume não puderam ser lidos. Isso pode indicar corrupção de dados. Por favor, faça um backup dos seus dados imediatamente.</string>
+    <string name="volume_integrity_warning">Aviso: Alguns arquivos nesta pasta criptografada não puderam ser lidos. Isso pode indicar corrupção de dados. Por favor, certifique-se de ter um backup previamente.</string>
     <string name="volume_init_failed">Falha ao inicializar o volume. Por favor, verifique se os arquivos do volume são acessíveis e não estão corrompidos.</string>
     <string name="volume_init_unknown_error">Falha ao abrir o volume (código de erro: %d). Por favor, verifique sua senha e certifique-se de que os arquivos do volume estão intactos.</string>
     <string name="io_error_during_operation">Ocorreu um erro de E/S ao acessar o arquivo. Os dados podem estar corrompidos.</string>
