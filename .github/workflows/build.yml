@@ -93,19 +93,25 @@ jobs:
           -keypass ${{ secrets.KEY_PASSWORD }} \
           -dname "CN=DroidFS, OU=DroidFS, O=DroidFS, L=Unknown, ST=Unknown, C=US"
 
-    - name: Sign APK
+    - name: Sign and collect APKs
       run: |
-        "$ANDROID_HOME/build-tools/34.0.0/apksigner" sign \
-          --out DroidFS-signed.apk \
-          -v \
-          --ks keystore.jks \
-          --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
-          --key-pass pass:${{ secrets.KEY_PASSWORD }} \
-          app/build/outputs/apk/release/app-release-unsigned.apk
+        mkdir -p signed
+        for apk in app/build/outputs/apk/release/*.apk; do
+          [ -f "$apk" ] || continue
+          name=$(basename "$apk")
+          echo "Signing $name..."
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" sign \
+            --out "signed/$name" \
+            -v \
+            --ks keystore.jks \
+            --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+            --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+            "$apk"
+        done
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
         name: DroidFS-signed
-        path: DroidFS-signed.apk
+        path: signed/*.apk
         retention-days: 30
