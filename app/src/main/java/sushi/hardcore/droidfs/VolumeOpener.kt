@@ -41,7 +41,7 @@ class VolumeOpener(
 
     private fun getErrorMsg(result: EncryptedVolume.InitResult): String {
         return if (result.errorStringId == 0) {
-            activity.getString(R.string.unknown_error_code, result.errorCode)
+            activity.getString(R.string.volume_init_unknown_error, result.errorCode)
         } else {
             activity.getString(result.errorStringId)
         }

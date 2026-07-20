@@ -290,4 +290,10 @@
     <string name="enter_volume_path">Enter volume path</string>
     <string name="more_options">More options</string>
     <string name="take_photos_repeatedly">Take photos repeatedly</string>
+    <string name="critical_file_delete_warning">This file is critical for the encrypted volume. Deleting it will result in permanent data loss. Operation cancelled.</string>
+    <string name="duplicate_file_in_batch">A file with the same name already exists in this import batch: %s</string>
+    <string name="volume_integrity_warning">Warning: Some directories in this volume could not be read. This may indicate data corruption. Please backup your data immediately.</string>
+    <string name="volume_init_failed">Failed to initialize the volume. Please verify the volume files are accessible and not corrupted.</string>
+    <string name="volume_init_unknown_error">Failed to open the volume (error code: %d). Please check your password and ensure the volume files are intact.</string>
+    <string name="io_error_during_operation">An I/O error occurred while accessing the file. The data may be corrupted.</string>
 </resources>

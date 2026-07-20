@@ -1,5 +1,6 @@
 package sushi.hardcore.droidfs.filesystems
 
+import android.util.Log
 import sushi.hardcore.droidfs.Constants
 import sushi.hardcore.droidfs.R
 import sushi.hardcore.droidfs.explorers.ExplorerElement
@@ -8,6 +9,8 @@ import sushi.hardcore.droidfs.util.PathUtils
 
 class CryfsVolume(private val fusePtr: Long): EncryptedVolume() {
     companion object {
+        private const val TAG = "CryfsVolume"
+
         init {
             System.loadLibrary("cryfs_jni")
         }
@@ -74,7 +77,8 @@ class CryfsVolume(private val fusePtr: Long): EncryptedVolume() {
                     16 -> R.string.inaccessible_base_dir
                     19 -> R.string.config_load_error
                     20 -> R.string.filesystem_id_changed
-                    else -> 0
+                    0 -> R.string.volume_init_failed
+                    else -> R.string.volume_init_unknown_error
                 }
             } else {
                 result.volume = CryfsVolume(fusePtr)
@@ -101,60 +105,124 @@ class CryfsVolume(private val fusePtr: Long): EncryptedVolume() {
     }
 
     override fun openFileReadMode(path: String): Long {
-        return nativeOpen(fusePtr, path, 0)
+        return try {
+            nativeOpen(fusePtr, path, 0)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to open file for reading: $path", e)
+            -1L
+        }
     }
 
     override fun openFileWriteMode(path: String): Long {
-        val fileHandle = nativeOpen(fusePtr, path, 0)
-        return if (fileHandle == -1L) {
-            nativeCreate(fusePtr, path, 0)
-        } else {
-            fileHandle
+        return try {
+            val fileHandle = nativeOpen(fusePtr, path, 0)
+            if (fileHandle == -1L) {
+                nativeCreate(fusePtr, path, 0)
+            } else {
+                fileHandle
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to open file for writing: $path", e)
+            -1L
         }
     }
 
     override fun read(fileHandle: Long, fileOffset: Long, buffer: ByteArray, dstOffset: Long, length: Long): Int {
-        return nativeRead(fusePtr, fileHandle, fileOffset, buffer, dstOffset, length)
+        return try {
+            nativeRead(fusePtr, fileHandle, fileOffset, buffer, dstOffset, length)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to read from file handle: $fileHandle", e)
+            -1
+        }
     }
 
     override fun write(fileHandle: Long, fileOffset: Long, buffer: ByteArray, srcOffset: Long, length: Long): Int {
-        return nativeWrite(fusePtr, fileHandle, fileOffset, buffer, srcOffset, length)
+        return try {
+            nativeWrite(fusePtr, fileHandle, fileOffset, buffer, srcOffset, length)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to write to file handle: $fileHandle", e)
+            -1
+        }
     }
 
     override fun truncate(path: String, size: Long): Boolean {
-        return nativeTruncate(fusePtr, path, size)
+        return try {
+            nativeTruncate(fusePtr, path, size)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to truncate file: $path", e)
+            false
+        }
     }
 
     override fun closeFile(fileHandle: Long): Boolean {
-        return nativeCloseFile(fusePtr, fileHandle)
+        return try {
+            nativeCloseFile(fusePtr, fileHandle)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to close file handle: $fileHandle", e)
+            false
+        }
     }
 
     override fun deleteFile(path: String): Boolean {
-        return nativeDeleteFile(fusePtr, path)
+        return try {
+            nativeDeleteFile(fusePtr, path)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to delete file: $path", e)
+            false
+        }
     }
 
     override fun readDir(path: String): MutableList<ExplorerElement>? {
-        return nativeReadDir(fusePtr, path)
+        return try {
+            nativeReadDir(fusePtr, path)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to read directory: $path", e)
+            null
+        }
     }
 
     override fun mkdir(path: String): Boolean {
-        return nativeMkdir(fusePtr, path, Stat.S_IFDIR)
+        return try {
+            nativeMkdir(fusePtr, path, Stat.S_IFDIR)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to create directory: $path", e)
+            false
+        }
     }
 
     override fun rmdir(path: String): Boolean {
-        return nativeRmdir(fusePtr, path)
+        return try {
+            nativeRmdir(fusePtr, path)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to remove directory: $path", e)
+            false
+        }
     }
 
     override fun getAttr(path: String): Stat? {
-        return nativeGetAttr(fusePtr, path)
+        return try {
+            nativeGetAttr(fusePtr, path)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to get attributes: $path", e)
+            null
+        }
     }
 
     override fun rename(srcPath: String, dstPath: String): Boolean {
-        return nativeRename(fusePtr, srcPath, dstPath)
+        return try {
+            nativeRename(fusePtr, srcPath, dstPath)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to rename: $srcPath -> $dstPath", e)
+            false
+        }
     }
 
     override fun close() {
-        return nativeClose(fusePtr)
+        try {
+            nativeClose(fusePtr)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to close volume", e)
+        }
     }
 
     override fun isClosed(): Boolean {

@@ -1,0 +1,88 @@
+name: Build DroidFS
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install NDK 25.2.9519653
+      run: sdkmanager 'ndk;25.2.9519653'
+
+    - name: Set NDK path
+      run: echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/25.2.9519653" >> $GITHUB_ENV
+
+    - name: Install Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential pkg-config npm
+
+    - name: Initialize submodules
+      run: |
+        git submodule update --init
+        cd app/libgocryptfs
+        git submodule update --init
+        cd ../libcryfs
+        git submodule update --init
+
+    - name: Build FFmpeg
+      run: |
+        cd app/ffmpeg
+        ./build.sh
+
+    - name: Build libgocryptfs
+      run: |
+        cd app/libgocryptfs
+        ./build.sh
+
+    - name: Build APK
+      run: ./gradlew assembleRelease
+
+    - name: Generate keystore
+      run: |
+        keytool -genkey -keystore keystore.jks -alias key -keyalg EC -validity 10000 \
+          -storepass ${{ secrets.KEYSTORE_PASSWORD }} \
+          -keypass ${{ secrets.KEY_PASSWORD }} \
+          -dname "CN=DroidFS, OU=DroidFS, O=DroidFS, L=Unknown, ST=Unknown, C=US"
+
+    - name: Sign APK
+      run: |
+        "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
+          --out DroidFS-signed.apk \
+          -v \
+          --ks keystore.jks \
+          --ks-pass pass:${{ secrets.KEYSTORE_PASSWORD }} \
+          --key-pass pass:${{ secrets.KEY_PASSWORD }} \
+          app/build/outputs/apk/release/app-release-unsigned.apk
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: DroidFS-signed
+        path: DroidFS-signed.apk
+        retention-days: 30

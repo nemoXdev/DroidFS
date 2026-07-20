@@ -41,7 +41,9 @@ import sushi.hardcore.droidfs.R
 import sushi.hardcore.droidfs.VolumeManager
 import sushi.hardcore.droidfs.VolumeManagerApp
 import sushi.hardcore.droidfs.explorers.ExplorerElement
+import sushi.hardcore.droidfs.filesystems.CryfsVolume
 import sushi.hardcore.droidfs.filesystems.EncryptedVolume
+import sushi.hardcore.droidfs.filesystems.GocryptfsVolume
 import sushi.hardcore.droidfs.filesystems.Stat
 import sushi.hardcore.droidfs.util.AndroidUtils
 import sushi.hardcore.droidfs.util.ObjRef
@@ -627,6 +629,14 @@ class FileOperationService : Service() {
         }
     }
 
+    private fun isCriticalVolumeFile(path: String): Boolean {
+        val fileName = File(path).name
+        return fileName == GocryptfsVolume.CONFIG_FILE_NAME ||
+               fileName == CryfsVolume.CONFIG_FILE_NAME ||
+               fileName == ".diriv" ||
+               fileName == "gocryptfs.conf.bak"
+    }
+
     private suspend fun recursiveRemoveDirectory(encryptedVolume: EncryptedVolume, path: String): String? {
         encryptedVolume.readDir(path)?.let { elements ->
             for (e in elements) {
@@ -651,6 +661,10 @@ class FileOperationService : Service() {
             var failedItem: String? = null
             for ((i, element) in items.withIndex()) {
                 yield()
+                if (isCriticalVolumeFile(element.fullPath)) {
+                    failedItem = element.fullPath
+                    break
+                }
                 if (element.isDirectory) {
                     recursiveRemoveDirectory(encryptedVolume, element.fullPath)?.let { failedItem = it }
                 } else if (!encryptedVolume.deleteFile(element.fullPath)) {

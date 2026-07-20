@@ -276,4 +276,24 @@
     <string name="debug">דיבאג</string>
     <string name="logcat_title">DroidFS Logcat</string>
     <string name="logcat_saved">Logcat נשמר</string>
+    <string name="later">لاحقاً</string>
+    <string name="notification_denied_msg">הרשאת התראות נדחה. פעולות קבצים ברקע לא יהיו גלויות. תוכל לשנות זאת בהגדרות הרשאות האפליקציה.</string>
+    <string name="keep_alive_notification_title">שירות שמירה על פעילות</string>
+    <string name="keep_alive_notification_text">אמצעי אחסון אחד או יותר נשארים פתוחים.</string>
+    <string name="close_all">סגור הכל</string>
+    <string name="usf_background">השבת נעילה אוטומטית של אמצעי אחסון</string>
+    <string name="usf_background_summary">אל תינעל אמצעי אחסון כאשר האפליקציה עוברת לרקע</string>
+    <string name="usf_keep_open_summary">השאר את האפליקציה פועלת ברקע כדי לשמור על אמצעי אחסון פתוחים</string>
+    <string name="gocryptfs_details">מהיר, אך אינו מסתיר גדלי קבצים ומבנה תיקיות</string>
+    <string name="cryfs_details">איטי יותר, אך מגן על נתוני מטא ומונע מתקפות החלפה</string>
+    <string name="or">או</string>
+    <string name="enter_volume_path">הזן נתיב אמצעי אחסון</string>
+    <string name="more_options">אפשרויות נוספות</string>
+    <string name="take_photos_repeatedly">צלם תמונות באופן חוזר</string>
+    <string name="critical_file_delete_warning">קובץ זה קריטי לאמצעי האחסון המוצפן. מחיקתו תוביל לאיבוד נתונים לצמיתות. הפעולה בוטלה.</string>
+    <string name="duplicate_file_in_batch">קובץ בשם זה כבר קיים באצולת הייבוא הזו: %s</string>
+    <string name="volume_integrity_warning">אזהרה: תיקיות מסוימות באמצעי אחסון זה לא ניתן לקריאה. הדבר עשוי להצביע על פגיעה בנתונים. אנא גבה את הנתונים שלך מיד.</string>
+    <string name="volume_init_failed">איפוס אמצעי האחסון נכשל. אנא ודא שקבצי אמצעי האחסון נגישים ואינם פגומים.</string>
+    <string name="volume_init_unknown_error">פתיחת אמצעי האחסון נכשלה (קוד שגיאה: %d). אנא בדוק את הסיסמה שלך וודא שקבצי אמצעי האחסון שלמים.</string>
+    <string name="io_error_during_operation">שגיאת קלט/פלט אירעה בעת גישה לקובץ. הנתונים עשויים להיות פגומים.</string>
 </resources>

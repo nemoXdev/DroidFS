@@ -275,4 +275,25 @@
     <string name="debug">Depurar</string>
     <string name="logcat_title">Logcat de DroidFS</string>
     <string name="logcat_saved">Logcat guardado</string>
+    <string name="later">Más tarde</string>
+    <string name="notification_denied_msg">El permiso de notificaciones ha sido denegado. Las operaciones de archivos en segundo plano no serán visibles. Puedes cambiar esto en los ajustes de permisos de la aplicación.</string>
+    <string name="keep_alive_notification_title">Servicio de mantenimiento activo</string>
+    <string name="keep_alive_notification_text">Uno o más volúmenes están abiertos.</string>
+    <string name="close_all">Cerrar todos</string>
+    <string name="usf_background">Desactivar el bloqueo automático de volúmenes</string>
+    <string name="usf_background_summary">No bloquear volúmenes cuando la aplicación pase a segundo plano</string>
+    <string name="usf_keep_open">Mantener volúmenes abiertos</string>
+    <string name="usf_keep_open_summary">Mantener la aplicación ejecutándose en segundo plano para mantener los volúmenes abiertos</string>
+    <string name="gocryptfs_details">Rápido, pero no oculta los tamaños de archivos y la estructura de directorios</string>
+    <string name="cryfs_details">Más lento, pero protege los metadatos y previene ataques de sustitución</string>
+    <string name="or">o</string>
+    <string name="enter_volume_path">Introduce la ruta del volumen</string>
+    <string name="more_options">Más opciones</string>
+    <string name="take_photos_repeatedly">Tomar fotos repetidamente</string>
+    <string name="critical_file_delete_warning">Este archivo es crítico para el volumen encriptado. Eliminarlo resultará en pérdida permanente de datos. Operación cancelada.</string>
+    <string name="duplicate_file_in_batch">Ya existe un archivo con el mismo nombre en este lote de importación: %s</string>
+    <string name="volume_integrity_warning">Advertencia: Algunos directorios en este volumen no pudieron ser leídos. Esto puede indicar corrupción de datos. Por favor, respalde sus datos inmediatamente.</string>
+    <string name="volume_init_failed">Error al inicializar el volumen. Por favor, verifique que los archivos del volumen sean accesibles y no estén corruptos.</string>
+    <string name="volume_init_unknown_error">Error al abrir el volumen (código de error: %d). Por favor, verifique su contraseña y asegúrese de que los archivos del volumen estén intactos.</string>
+    <string name="io_error_during_operation">Ocurrió un error de E/S al acceder al archivo. Los datos pueden estar corruptos.</string>
 </resources>

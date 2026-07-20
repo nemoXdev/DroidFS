@@ -275,4 +275,25 @@
     <string name="debug">Debug</string>
     <string name="logcat_title">DroidFS Logcat</string>
     <string name="logcat_saved">Logcat kaydedildi</string>
+    <string name="later">Daha sonra</string>
+    <string name="notification_denied_msg">Bildirim izni reddedildi. Arka plan dosya işlemleri görünür olmayacaktır. Bunu uygulama izin ayarlarından değiştirebilirsiniz.</string>
+    <string name="keep_alive_notification_title">Aktif tutma hizmeti</string>
+    <string name="keep_alive_notification_text">Bir veya daha fazla birim açık tutuluyor.</string>
+    <string name="close_all">Tümünü kapat</string>
+    <string name="usf_background">Otomatik birim kilitlemeyi devre dışı bırak</string>
+    <string name="usf_background_summary">Uygulama arka plana geçtiğinde birimleri kilitleme</string>
+    <string name="usf_keep_open">Birimleri açık tut</string>
+    <string name="usf_keep_open_summary">Birimleri açık tutmak için uygulamayı arka planda çalışmaya devam ettir</string>
+    <string name="gocryptfs_details">Hızlı, ancak dosya boyutlarını ve dizin yapısını gizlemez</string>
+    <string name="cryfs_details">Daha yavaş, ancak meta verileri korur ve değiştirme saldırılarını önler</string>
+    <string name="or">veya</string>
+    <string name="enter_volume_path">Birim yolunu girin</string>
+    <string name="more_options">Daha fazla seçenek</string>
+    <string name="take_photos_repeatedly">Fotoğrafları tekrar tekrar çek</string>
+    <string name="critical_file_delete_warning">Bu dosya şifreli birim için kritik öneme sahiptir. Silinmesi kalıcı veri kaybına yol açacaktır. İşlem iptal edildi.</string>
+    <string name="duplicate_file_in_batch">Bu içe aktarma toplu işinde aynı isimde bir dosya zaten mevcut: %s</string>
+    <string name="volume_integrity_warning">Uyarı: Bu birimdeki bazı klasörler okunamadı. Bu, veri bozulmasına işaret edebilir. Lütfen verilerinizi hemen yedekleyin.</string>
+    <string name="volume_init_failed">Birim başlatılamadı. Lütfen birim dosyalarının erişilebilir ve bozulmamış olduğundan emin olun.</string>
+    <string name="volume_init_unknown_error">Birim açılamadı (hata kodu: %d). Lütfen şifrenizi kontrol edin ve birim dosyalarının bozulmamış olduğundan emin olun.</string>
+    <string name="io_error_during_operation">Dosyaya erişirken bir G/Ç hatası oluştu. Veriler bozulmuş olabilir.</string>
 </resources>

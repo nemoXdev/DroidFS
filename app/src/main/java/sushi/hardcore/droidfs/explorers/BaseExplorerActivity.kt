@@ -371,7 +371,16 @@ open class BaseExplorerActivity : BaseActivity(), ExplorerElementAdapter.Listene
         directoryLoadingTask?.cancelAndJoin()
         recycler_view_explorer.isVisible = false
         loader.isVisible = true
-        explorerElements = encryptedVolume.readDir(path) ?: return@launch
+        val readResult = encryptedVolume.readDir(path)
+        if (readResult == null) {
+            CustomAlertDialogBuilder(this@BaseExplorerActivity, theme)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.volume_integrity_warning)
+                .setPositiveButton(R.string.ok, null)
+                .show()
+            return@launch
+        }
+        explorerElements = readResult
         if (path != "/") {
             explorerElements.add(
                 0,
@@ -444,35 +453,48 @@ open class BaseExplorerActivity : BaseActivity(), ExplorerElementAdapter.Listene
 
     protected fun checkPathOverwrite(items: List<OperationFile>, dstDirectoryPath: String, callback: (List<OperationFile>?) -> Unit) {
         val srcDirectoryPath = items[0].parentPath
+        val assignedDstPaths = HashMap<String, Int>() // dstPath -> index of first item that claimed it
         var ready = true
         for (i in items.indices) {
             val testDstPath: String
             if (items[i].dstPath == null){
                 testDstPath = PathUtils.pathJoin(dstDirectoryPath, PathUtils.getRelativePath(srcDirectoryPath, items[i].srcPath))
-                if (encryptedVolume.pathExists(testDstPath)) {
+                val existingIndex = assignedDstPaths[testDstPath]
+                if (existingIndex != null && existingIndex != i) {
+                    ready = false
+                } else if (encryptedVolume.pathExists(testDstPath)) {
                     ready = false
                 } else {
                     items[i].dstPath = testDstPath
+                    assignedDstPaths[testDstPath] = i
                 }
             } else {
                 testDstPath = items[i].dstPath!!
-                if (encryptedVolume.pathExists(testDstPath) && !items[i].overwriteConfirmed) {
+                val existingIndex = assignedDstPaths[testDstPath]
+                if (existingIndex != null && existingIndex != i) {
                     ready = false
+                } else if (encryptedVolume.pathExists(testDstPath) && !items[i].overwriteConfirmed) {
+                    ready = false
+                } else {
+                    assignedDstPaths[testDstPath] = i
                 }
             }
             if (!ready){
+                val isBatchDuplicate = assignedDstPaths.containsKey(testDstPath)
+                val message = if (isBatchDuplicate) {
+                    getString(R.string.duplicate_file_in_batch, testDstPath)
+                } else if (items[i].isDirectory) {
+                    getString(R.string.dir_overwrite_question, testDstPath)
+                } else {
+                    getString(R.string.file_overwrite_question, testDstPath)
+                }
                 CustomAlertDialogBuilder(this, theme)
                     .setTitle(R.string.warning)
-                    .setMessage(getString(
-                        if (items[i].isDirectory) {
-                            R.string.dir_overwrite_question
-                        } else {
-                            R.string.file_overwrite_question
-                        }, testDstPath
-                    ))
+                    .setMessage(message)
                     .setPositiveButton(R.string.yes) {_, _ ->
                         items[i].dstPath = testDstPath
                         items[i].overwriteConfirmed = true
+                        assignedDstPaths[testDstPath] = i
                         checkPathOverwrite(items, dstDirectoryPath, callback)
                     }
                     .setNegativeButton(R.string.no) { _, _ ->

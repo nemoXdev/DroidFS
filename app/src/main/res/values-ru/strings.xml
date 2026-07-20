@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name">DroidFS</string>
     <string name="create_volume">Создать том</string>
     <string name="open">Открыть</string>
     <string name="create">Создать</string>
@@ -11,6 +12,7 @@
     <string name="dir_empty">Пусто</string>
     <string name="warning">Предупреждение!</string>
     <string name="ask_lock_volume">Заблокировать том?</string>
+    <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
     <string name="enter_folder_name">Имя папки:</string>
     <string name="error">Ошибка</string>
@@ -56,6 +58,7 @@
     <string name="listdir_null_error_msg">Невозможно получить доступ к этой папке.</string>
     <string name="fingerprint_save_checkbox_text">Сохранить хеш пароля отпечатком пальца</string>
     <string name="fingerprint_instruction">Прикоснитесь к сканеру отпечатков пальцев</string>
+    <string name="illegal_block_size_exception">IllegalBlockSizeException</string>
     <string name="illegal_block_size_exception_msg">Это могло произойти, если вы добавили новый отпечаток пальца. Сброс хранилища хешей должен решить эту проблему.</string>
     <string name="reset_hash_storage">Сброс хранилища хешей</string>
     <string name="MAC_verification_failed">Проверка подписи/MAC не выполнена. Хранилище ключей Android или сохранённый хеш был изменён. Сброс хранилища хешей должен решить эту проблему.</string>
@@ -99,7 +102,9 @@
     <string name="loading_msg_export">Экспортирование файлов…</string>
     <string name="query_cursor_null_error_msg">Невозможно получить доступ к этому файлу.</string>
     <string name="about">О приложении</string>
+    <string name="github">GitHub</string>
     <string name="github_summary">Репозиторий DroidFS на GitHub. Исходный код, документация, трекер ошибок…</string>
+    <string name="gitea">Gitea</string>
     <string name="gitea_summary">Репозиторий DroidFS на Chapril Gitea. В отличие от GitHub, Gitea является полностью свободным программным обеспечением и автономным хостингом. Исходный код, документация, трекер ошибок…</string>
     <string name="share">Поделиться</string>
     <string name="decrypt_files">Экспорт/расшифровка</string>
@@ -132,6 +137,7 @@
     <string name="error_not_a_volume">Зашифрованный том не распознан. Проверьте выбранный путь.</string>
     <string name="version">Версия</string>
     <string name="error_cipher_null">Шифр ошибки нулевой</string>
+    <string name="key_permanently_invalidated_exception">KeyPermanentlyInvalidatedException</string>
     <string name="key_permanently_invalidated_exception_msg">Похоже, вы добавили новый отпечаток пальца. Сохранённый хеш паролей стал непригодным для использования.</string>
     <string name="usf_read_doc">Вы должны внимательно прочитать документацию, прежде чем включать любую из этих функций.</string>
     <string name="usf_doc">Документация по небезопасным функциям</string>
@@ -176,6 +182,7 @@
     <string name="select_all">Выбрать все</string>
     <string name="remove_fingerprint">Удалить отпечаток</string>
     <string name="unrecoverable_key_exception_msg">%s. Невозможно загрузить ключ шифрования.</string>
+    <string name="unrecoverable_key_exception">UnrecoverableKeyException</string>
     <string name="delete_hidden_volume_question">Том \"%s\" скрытый, вы хотите только забыть путь к нему или УДАЛИТЬ том со всем его СОДЕРЖИМЫМ?</string>
     <string name="forget_only">Только забыть</string>
     <string name="delete_volume">Удалить том</string>
@@ -224,9 +231,12 @@
     <string name="pin_passwords_title">Цифровая клавиатура</string>
     <string name="pin_passwords_summary">Использовать цифровую раскладку клавиатуры при вводе паролей томов</string>
     <string name="volume_type_label">Тип тома:</string>
+    <string name="gocryptfs">Gocryptfs</string>
+    <string name="cryfs">CryFS</string>
     <string name="gocryptfs_disabled">Поддержка Gocryptfs отключена</string>
     <string name="cryfs_disabled">Поддержка CryFS отключена</string>
     <string name="file_op_delete_msg">Удаление файлов…</string>
+    <string name="volume_type">(%s)</string>
     <string name="volume_type_read_only">(%s, только чтение)</string>
     <string name="volume_type_inaccessible">(%s, недоступен)</string>
     <string name="io_error">Ошибка ввода/вывода.</string>
@@ -253,6 +263,7 @@
     <string name="usf_expose_summary">Разрешить другим приложениям просматривать открытые тома через поставщиков документов</string>
     <string name="usf_saf_write">Разрешить запись</string>
     <string name="usf_saf_write_summary">Разрешить другим приложениям изменять открытые файлы</string>
+    <string name="saf">Фреймворк доступа к хранилищу</string>
     <string name="tmp_export_failed">Экспорт не выполнен: %s</string>
     <string name="export_failed_create">невозможно создать экспортируемый файл</string>
     <string name="export_failed_export">невозможно экспортировать файл</string>
@@ -277,4 +288,12 @@
     <string name="cryfs_details">Медленнее, но защищает метаданные и предотвращает атаки замещения</string>
     <string name="or">или</string>
     <string name="enter_volume_path">Введите путь к тому</string>
+    <string name="more_options">Дополнительные параметры</string>
+    <string name="take_photos_repeatedly">Делать фотографии повторно</string>
+    <string name="critical_file_delete_warning">Этот файл критически важен для зашифрованного тома. Его удаление приведёт к безвозвратной потере данных. Операция отменена.</string>
+    <string name="duplicate_file_in_batch">Файл с таким именем уже существует в этом пакете импорта: %s</string>
+    <string name="volume_integrity_warning">Внимание: Некоторые папки в этом томе не могут быть прочитаны. Это может указывать на повреждение данных. Пожалуйста, создайте резервную копию данных немедленно.</string>
+    <string name="volume_init_failed">Не удалось инициализировать том. Пожалуйста, убедитесь, что файлы тома доступны и не повреждены.</string>
+    <string name="volume_init_unknown_error">Не удалось открыть том (код ошибки: %d). Пожалуйста, проверьте пароль и убедитесь, что файлы тома в целостности.</string>
+    <string name="io_error_during_operation">Произошла ошибка ввода/вывода при доступе к файлу. Данные могут быть повреждены.</string>
 </resources>

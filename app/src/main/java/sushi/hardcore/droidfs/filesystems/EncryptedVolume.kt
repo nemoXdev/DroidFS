@@ -216,4 +216,27 @@ abstract class EncryptedVolume: Observable<EncryptedVolume.Observer>() {
         }
         return result
     }
+
+    /**
+     * Check volume integrity by scanning directories.
+     * Returns a list of directories that could not be read (potential corruption).
+     */
+    fun checkVolumeIntegrity(): List<String> {
+        val corruptedDirs = mutableListOf<String>()
+        checkDirectoryIntegrity("/", corruptedDirs)
+        return corruptedDirs
+    }
+
+    private fun checkDirectoryIntegrity(path: String, corruptedDirs: MutableList<String>) {
+        val elements = readDir(path)
+        if (elements == null && path != "/") {
+            corruptedDirs.add(path)
+            return
+        }
+        elements?.forEach { element ->
+            if (element.isDirectory) {
+                checkDirectoryIntegrity(element.fullPath, corruptedDirs)
+            }
+        }
+    }
 }

@@ -24,7 +24,7 @@ class GocryptfsVolume(private val sessionID: Int): EncryptedVolume() {
 
     companion object {
         const val KeyLen = 32
-        private const val ScryptDefaultLogN = 16
+        private const val ScryptDefaultLogN = 20
         private const val VOLUME_CREATOR = "DroidFS"
         private const val MAX_KERNEL_WRITE = 128*1024
         const val CONFIG_FILE_NAME = "gocryptfs.conf"
@@ -86,7 +86,7 @@ class GocryptfsVolume(private val sessionID: Int): EncryptedVolume() {
                         result.worthRetry = true
                         R.string.wrong_password
                     }
-                    else -> 0
+                    else -> R.string.volume_init_unknown_error
                 }
             } else {
                 result.volume = GocryptfsVolume(sessionId)
