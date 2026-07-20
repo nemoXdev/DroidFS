@@ -54,7 +54,26 @@ jobs:
     - name: Initialize submodules
       run: git submodule update --init --recursive
 
+    - name: Cache FFmpeg build
+      uses: actions/cache@v4
+      id: cache-ffmpeg
+      with:
+        path: app/ffmpeg/build
+        key: ffmpeg-${{ runner.os }}-${{ hashFiles('app/ffmpeg/build.sh') }}
+
+    - name: Cache CryFS native build
+      uses: actions/cache@v4
+      id: cache-cryfs
+      with:
+        path: |
+          app/libcryfs/vendor/boost/Boost-for-Android/build
+          app/build/.cxx
+        key: cryfs-${{ runner.os }}-${{ hashFiles('app/CMakeLists.txt') }}
+        restore-keys: |
+          cryfs-${{ runner.os }}-
+
     - name: Build FFmpeg
+      if: steps.cache-ffmpeg.outputs.cache-hit != 'true'
       run: |
         cd app/ffmpeg
         ./build.sh
