@@ -128,6 +128,7 @@ class FileOperationService : Service() {
     private val notifications = HashMap<Int, NotificationCompat.Builder>()
     private var foregroundNotificationId = -1
     private val tasks = HashMap<Int, Job>()
+    private val lastNotificationUpdate = HashMap<Int, Long>()
     private var newTaskId = 1
     private var pendingTask: PendingTask<*>? = null
 
@@ -255,9 +256,15 @@ class FileOperationService : Service() {
     }
 
     private fun updateNotificationProgress(taskId: Int, fileProgress: Int, totalFiles: Int, bytesProgress: Long, totalBytes: Long) {
+        val now = System.currentTimeMillis()
+        val lastUpdate = lastNotificationUpdate[taskId] ?: 0
+        if (now - lastUpdate < 500) return
+        lastNotificationUpdate[taskId] = now
         val notificationBuilder = notifications[taskId] ?: return
+        val totalMB = (totalBytes / (1024 * 1024)).toInt().coerceAtLeast(1)
+        val progressMB = (bytesProgress / (1024 * 1024)).toInt().coerceIn(0, totalMB)
         notificationBuilder
-                .setProgress(totalFiles, fileProgress, false)
+                .setProgress(totalMB, progressMB, false)
                 .setContentText("$fileProgress/$totalFiles · ${formatFileSize(bytesProgress)} / ${formatFileSize(totalBytes)}")
         notificationManager.notify(taskId, notificationBuilder.build())
     }
@@ -294,6 +301,7 @@ class FileOperationService : Service() {
                     notificationManager.cancel(taskId)
                     notifications.remove(taskId)
                     tasks.remove(taskId)
+                    lastNotificationUpdate.remove(taskId)
                     if (tasks.size == 0) {
                         // last task finished, remove from foreground state but don't stop the service
                         ServiceCompat.stopForeground(this@FileOperationService, ServiceCompat.STOP_FOREGROUND_REMOVE)
